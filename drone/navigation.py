@@ -25,7 +25,7 @@ UAV = connect(portInformation, wait_ready=True)
 
 #wait for radio transmission from ground station UI, store transmitted values into this array
 #0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
-GPSCoordinates = [[],[],[],[],[],[]];
+GPSCoordinates = [];
 
 
 
@@ -77,12 +77,12 @@ def distanceRelative(Location1, Location2):
 
 
 '''
-This function takes a LocationGlobalRelative object, and two offset values in meters, and returns another 
+This function takes a LocationGlobalRelative object and two offset values in meters, and returns another 
 LocationGlobalRelative object offset from the original location according to the two values provided.
 It is based on the DroneKit documentation at https://dronekit-python.readthedocs.io/en/stable/
 Input Variables: ISU, LocationGlobalRelative. offsetNorth, offsetEast, integers in meters.
 '''
-def searchLocation(ISU, offsetNorth, offsetEast)
+def searchLocation(ISU, offsetNorth, offsetEast):
 
     dimensionRad = 6378137.0
     offsetLat = offsetNorth/dimensionRad
@@ -101,7 +101,7 @@ This function is the basic travel-to-point function that will be utilized to tra
 to the ground station in turn.
 Input Variables: latitude, longitude, floats.
 '''
-def travel(latitude, longitude):
+def travel(latitude, longitude, alt):
 
     print("Initializing travel to coordinates: ", latitude, ", ", longitude)
     if not UAV.location.global_relative_frame.alt >= 10:
@@ -112,7 +112,7 @@ def travel(latitude, longitude):
         print("UAV active, beginning travel.")
 
     currentLocation = UAV.location.global_relative_frame
-    goalLocation = LocationGlobalRelative(latitude, longitude, 30)
+    goalLocation = LocationGlobalRelative(latitude, longitude, alt)
 
     UAV.simple_goto(goalLocation)
     print("Distance to waypoint: ", distanceRelative(currentLocation, goalLocation), " meter(s)")
@@ -132,6 +132,7 @@ UAV, and plots a search pattern with an ever-increasingly sized square based on 
 the search square is, with thresholds determining the overall size of the pattern. Minimum points is four.
 Each next four increases the diagonal distance from original ISU location by 50 meters.
 Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative.
+Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
 def searchPattern(searchPoints, ISULocation):
 
@@ -157,7 +158,7 @@ def searchPattern(searchPoints, ISULocation):
         print("Overruling user input, scaling to multiple of 4. Final value: ", searchPoints)
 
     #generating searchPoints number of locations to ping ISU at
-    #these locations are the corners of concentric circles
+    #these locations are the corners of concentric squares
 
     pingLocs = []
     squares = int(searchPoints/4)
@@ -173,16 +174,34 @@ def searchPattern(searchPoints, ISULocation):
         if corner == 3:
             pingLocs[x] = searchLocation(ISULocation, 35.355*squares, -35.355*squares)
 
+    #this loop tells the drone to go to each of the locations created above, and ping the ISU
+    #exits function upon successful ping, because data can be transferred
+    #if it reaches the end of the list with no successful ping, returns 0
+
     for y in range(searchPoints):
-        f
+
+        travel(pingLocs[0].lat, pingLocs[y].lon, 30)
+        #ping drone, return 1 or 0 if success/fail
+        placeholder = 3
+        if placeholder == 1:
+            print("ISU communication established, exiting search pattern successfully.")
+            return 1;
+
+
+    print("Search pattern executed, no ISU located. Exiting.")
+    return 0;
+
+
+'''
+This function handles the landing of the drone, with added safety checks to make sure the drone doesn't
+land so enthusiastically it crashes headlong into the ground. It takes the lat/lon coordinates of the home station as
+given this program by the user interface, and lands the drone, much slower when the altitude reaches 10m.
+Input Variables: homeLat, homeLong, floats.
+'''
+def landingSequence(homeLat, homeLong):
 
 
 
+    if not distanceRelative()
 
-
-
-
-
-
-#still workin
 
