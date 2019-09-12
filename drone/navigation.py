@@ -24,7 +24,7 @@ print("Connecting to UAV.")
 UAV = connect(portInformation, wait_ready=True)
 
 #wait for radio transmission from ground station UI, store transmitted values into this array
-#0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/longaa
+#0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
 GPSCoordinates = [[],[],[],[],[],[]];
 
 
@@ -75,10 +75,31 @@ def distanceRelative(Location1, Location2):
 
     return distMeters
 
+
+'''
+This function takes a LocationGlobalRelative object, and two offset values in meters, and returns another 
+LocationGlobalRelative object offset from the original location according to the two values provided.
+It is based on the DroneKit documentation at https://dronekit-python.readthedocs.io/en/stable/
+Input Variables: ISU, LocationGlobalRelative. offsetNorth, offsetEast, integers in meters.
+'''
+def searchLocation(ISU, offsetNorth, offsetEast)
+
+    dimensionRad = 6378137.0
+    offsetLat = offsetNorth/dimensionRad
+    offsetLong = offsetEast/ (dimensionRad * math.cos(math.pi * ISU.lat / 180))
+
+    newLat = ISU.lat + (offsetLat * 180 / math.pi)
+    newLong = ISU.long + (offsetLong * 180 / math.pi)
+
+    offsetLocation = LocationGlobalRelative(newLat, newLong, ISU.alt)
+
+    return offsetLocation;
+
+
 '''
 This function is the basic travel-to-point function that will be utilized to travel to each of the ISUs and back
 to the ground station in turn.
-Input Variables: latitude, float; longitude, float.
+Input Variables: latitude, longitude, floats.
 '''
 def travel(latitude, longitude):
 
@@ -107,10 +128,14 @@ def travel(latitude, longitude):
 
 '''
 This function is called when no communication with an ISU can be established. It takes the current location of the
-UAV, and plots a search pattern with a number of points based on the input.
-Input Variables: searchPoints, integer.
+UAV, and plots a search pattern with an ever-increasingly sized square based on the input. The more points, the larger 
+the search square is, with thresholds determining the overall size of the pattern. Minimum points is four.
+Each next four increases the diagonal distance from original ISU location by 50 meters.
+Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative.
 '''
-def searchPattern(searchPoints):
+def searchPattern(searchPoints, ISULocation):
+
+    #35.355 meters offset to N/E for 50 meter right triangle hypotenuse
 
     print("Search pattern initializing with ", searchPoints, " discrete points.")
 
@@ -121,6 +146,42 @@ def searchPattern(searchPoints):
 
     if UAV.system_status == ACTIVE:
         print("UAV active, beginning search pattern.")
+
+
+    #Sets searchPoints to the next highest multiple of 4 if it not already set to one.
+    if searchPoints % 4 != 0 :
+        if searchPoints == 0:
+            print("Called function with zero search points, aborting.")
+            return None;
+        searchPoints = searchPoints + (4-(searchPoints % 4));
+        print("Overruling user input, scaling to multiple of 4. Final value: ", searchPoints)
+
+    #generating searchPoints number of locations to ping ISU at
+    #these locations are the corners of concentric circles
+
+    pingLocs = []
+    squares = int(searchPoints/4)
+
+    for x in range(searchPoints):
+        corner = x % 4;
+        if corner == 0:
+            pingLocs[x] = searchLocation(ISULocation, 35.355*squares, 35.355*squares)
+        if corner == 1:
+            pingLocs[x] = searchLocation(ISULocation, -35.355*squares, 35.355*squares)
+        if corner == 2:
+            pingLocs[x] = searchLocation(ISULocation, -35.355*squares, -35.355*squares)
+        if corner == 3:
+            pingLocs[x] = searchLocation(ISULocation, 35.355*squares, -35.355*squares)
+
+    for y in range(searchPoints):
+        f
+
+
+
+
+
+
+
 
 
 #still workin
