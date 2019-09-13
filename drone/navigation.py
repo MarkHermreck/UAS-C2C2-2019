@@ -89,7 +89,7 @@ def searchLocation(ISU, offsetNorth, offsetEast):
     offsetLong = offsetEast / (dimensionRad * math.cos(math.pi * ISU.lat / 180))
 
     newLat = ISU.lat + (offsetLat * 180 / math.pi)
-    newLong = ISU.long + (offsetLong * 180 / math.pi)
+    newLong = ISU.lon + (offsetLong * 180 / math.pi)
 
     offsetLocation = LocationGlobalRelative(newLat, newLong, ISU.alt)
 
@@ -212,4 +212,5 @@ def landingSequence(homeLat, homeLong):
 
 
 takeoffSequence(30);
-travel(50,50,30);
+searchPattern(3,UAV.location.global_relative_frame)
+#travel(50,50,30);
