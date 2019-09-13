@@ -109,22 +109,24 @@ def travel(latitude, longitude, alt):
         print("UAV altitude under 10 meters, aborting travel.")
         return None
 
-    if UAV.system_status == ACTIVE:
-        print("UAV active, beginning travel.")
+    #if UAV.system_status == ACTIVE:
+    #    print("UAV active, beginning travel.")
 
     currentLocation = UAV.location.global_relative_frame
     goalLocation = LocationGlobalRelative(latitude, longitude, alt)
+    totalDistance = distanceRelative(UAV.location.global_relative_frame,goalLocation)
 
     UAV.simple_goto(goalLocation)
     print("Distance to waypoint: ", distanceRelative(currentLocation, goalLocation), " meter(s)")
 
-    '''while not close'''
+    #provides status updates while traveling
+    while not (distanceRelative(UAV.location.global_relative_frame, goalLocation)) < (totalDistance * .1):
+        print("Traveling. Distance remaining: ", distanceRelative(UAV.location.global_relative_frame, goalLocation), " meter(s).")
+        time.sleep(2)
+
 
     print("Waypoint reached. Commencing hover.")
     return None
-
-
-# still workin
 
 
 '''
@@ -136,7 +138,6 @@ Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
 
-
 def searchPattern(searchPoints, ISULocation):
     # 35.355 meters offset to N/E for 50 meter right triangle hypotenuse
 
@@ -147,8 +148,8 @@ def searchPattern(searchPoints, ISULocation):
         print("UAV under 10 meters, aborting search pattern.")
         return None
 
-    if UAV.system_status == ACTIVE:
-        print("UAV active, beginning search pattern.")
+    #if UAV.system_status == ACTIVE:
+    #    print("UAV active, beginning search pattern.")
 
     # Sets searchPoints to the next highest multiple of 4 if it not already set to one.
     if searchPoints % 4 != 0:
@@ -186,10 +187,10 @@ def searchPattern(searchPoints, ISULocation):
         placeholder = 3
         if placeholder == 1:
             print("ISU communication established, exiting search pattern successfully.")
-            return 1;
+            return 1
 
     print("Search pattern executed, no ISU located. Exiting.")
-    return 0;
+    return 0
 
 
 '''
@@ -204,4 +205,11 @@ def landingSequence(homeLat, homeLong):
     homeLocation = LocationGlobalRelative(homeLat,homeLong,0);
 
 
-    if not distanceRelative() < 10
+    if not distanceRelative(UAV.location.global_relative_frame, homeLocation) < 10:
+        print("UAV over 10 meters from home station, aborting landing sequence.")
+        return None
+
+
+
+takeoffSequence(30);
+travel(50,50,30);
