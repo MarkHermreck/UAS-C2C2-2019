@@ -31,8 +31,6 @@ This function arms the UAV and initializes its takeoff to an altitude determined
 The only input is the takeoff goal altitude, but returns nothing.
 Input Variables: goalAltitude in meters, integer.
 '''
-
-
 def takeoffSequence(goalAltitude):
     print("Takeoff Sequence Initializing. - Ensure area above UAV is clear.")
 
@@ -64,13 +62,12 @@ It is based on the ArduPilot file using it at https://github.com/ArduPilot/ardup
 It is also found in the DroneKit documentation at https://dronekit-python.readthedocs.io/en/stable/
 Input Variables: Location1, LocationGlobalRelative. Location2, LocationGlobalRelative. 
 '''
-
-
 def distanceRelative(Location1, Location2):
-    latitude = Location2.lat - Location2.lat
-    longitude = Location2.lon - Location2.lon
+    latitude = Location2.lat - Location1.lat
+    longitude = Location2.lon - Location1.lon
 
-    distMeters = math.sqrt((latitude * latitude) + (longitude * longitude)) * 1.113195e5
+    distMeters = round(math.sqrt((latitude * latitude) + (longitude * longitude)) * 1.113195e5, 3)
+
 
     return distMeters
 
@@ -81,8 +78,6 @@ LocationGlobalRelative object offset from the original location according to the
 It is based on the DroneKit documentation at https://dronekit-python.readthedocs.io/en/stable/
 Input Variables: ISU, LocationGlobalRelative. offsetNorth, offsetEast, integers in meters.
 '''
-
-
 def searchLocation(ISU, offsetNorth, offsetEast):
     dimensionRad = 6378137.0
     offsetLat = offsetNorth / dimensionRad
@@ -101,8 +96,6 @@ This function is the basic travel-to-point function that will be utilized to tra
 to the ground station in turn.
 Input Variables: latitude, longitude, floats.
 '''
-
-
 def travel(latitude, longitude, alt):
     print("Initializing travel to coordinates: ", latitude, ", ", longitude)
     if not UAV.location.global_relative_frame.alt >= 10:
@@ -120,7 +113,7 @@ def travel(latitude, longitude, alt):
     print("Distance to waypoint: ", distanceRelative(currentLocation, goalLocation), " meter(s)")
 
     #provides status updates while traveling
-    while not (distanceRelative(UAV.location.global_relative_frame, goalLocation)) < (totalDistance * .1):
+    while not (distanceRelative(UAV.location.global_relative_frame, goalLocation)) < 5:
         print("Traveling. Distance remaining: ", distanceRelative(UAV.location.global_relative_frame, goalLocation), " meter(s).")
         time.sleep(2)
 
@@ -137,7 +130,6 @@ Each next four increases the diagonal distance from original ISU location by 50 
 Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
-
 def searchPattern(searchPoints, ISULocation):
     # 35.355 meters offset to N/E for 50 meter right triangle hypotenuse
 
@@ -161,8 +153,9 @@ def searchPattern(searchPoints, ISULocation):
 
     # generating searchPoints number of locations to ping ISU at
     # these locations are the corners of concentric squares
+    # instantiates empty list of size searchPoints
 
-    pingLocs = []
+    pingLocs = [None] * searchPoints;
     squares = int(searchPoints / 4)
 
     for x in range(searchPoints):
@@ -182,7 +175,7 @@ def searchPattern(searchPoints, ISULocation):
 
     for y in range(searchPoints):
 
-        travel(pingLocs[0].lat, pingLocs[y].lon, 30)
+        travel(pingLocs[y].lat, pingLocs[y].lon, ISULocation.alt)
         # ping drone, return 1 or 0 if success/fail
         placeholder = 3
         if placeholder == 1:
@@ -211,6 +204,13 @@ def landingSequence(homeLat, homeLong):
 
 
 
+#default location is canberra, australia
+#35.363261
+#149.1652299
+print(UAV.location.global_relative_frame.lat)
+print(UAV.location.global_relative_frame.lon)
+
 takeoffSequence(30);
-searchPattern(3,UAV.location.global_relative_frame)
-#travel(50,50,30);
+travel(-35.364,149.167,30);
+searchPattern(3, UAV.location.global_relative_frame)
+
