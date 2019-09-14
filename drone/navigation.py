@@ -8,30 +8,12 @@ from dronekit import connect, LocationGlobal, LocationGlobalRelative, Vehicle, V
 from pymavlink import mavutil
 import time, math, dronekit_sitl
 
-# This block of code connects to the UAV over its serial connection, Pi -> PixHawk
-# It also initalizes the vehicle object referenced throughout this file.
-# When the connection information is known, fill out the portInformation variable to disable auto-start of SITL.
-portInformation = None
-testSITL = None
-
-if not portInformation:
-    testSITL = dronekit_sitl.start_default()
-    portInformation = testSITL.connection_string()
-    print("Starting SITL Test Environment, No UAV Detected")
-
-print("Connecting to UAV.")
-UAV = connect(portInformation, wait_ready=True)
-
-# wait for radio transmission from ground station UI, store transmitted values into this array
-# 0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
-GPSCoordinates = [];
-
 '''
 This function arms the UAV and initializes its takeoff to an altitude determined by the goalAltitude variable.
 The only input is the takeoff goal altitude, but returns nothing.
-Input Variables: goalAltitude in meters, integer.
+Input Variables: goalAltitude in meters, integer. UAV, UAV object created in main.py
 '''
-def takeoffSequence(goalAltitude):
+def takeoffSequence(goalAltitude, UAV):
     print("Takeoff Sequence Initializing. - Ensure area above UAV is clear.")
 
     while not UAV.is_armable:
@@ -94,9 +76,9 @@ def searchLocation(ISU, offsetNorth, offsetEast):
 '''
 This function is the basic travel-to-point function that will be utilized to travel to each of the ISUs and back
 to the ground station in turn.
-Input Variables: latitude, longitude, floats.
+Input Variables: latitude, longitude, floats. alt, integer. UAV, UAV object created in main.py
 '''
-def travel(latitude, longitude, alt):
+def travel(latitude, longitude, alt, UAV):
     print("Initializing travel to coordinates: ", latitude, ", ", longitude)
     if not UAV.location.global_relative_frame.alt >= 10:
         print("UAV altitude under 10 meters, aborting travel.")
@@ -127,10 +109,10 @@ This function is called when no communication with an ISU can be established. It
 UAV, and plots a search pattern with an ever-increasingly sized square based on the input. The more points, the larger 
 the search square is, with thresholds determining the overall size of the pattern. Minimum points is four.
 Each next four increases the diagonal distance from original ISU location by 50 meters.
-Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative.
+Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, UAV object created in main.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
-def searchPattern(searchPoints, ISULocation):
+def searchPattern(searchPoints, ISULocation, UAV):
     # 35.355 meters offset to N/E for 50 meter right triangle hypotenuse
 
     print("Search pattern initializing with ", searchPoints, " discrete points.")
@@ -155,7 +137,7 @@ def searchPattern(searchPoints, ISULocation):
     # these locations are the corners of concentric squares
     # instantiates empty list of size searchPoints
 
-    pingLocs = [None] * searchPoints;
+    pingLocs = [None] * searchPoints
     squares = int(searchPoints / 4)
 
     for x in range(searchPoints):
@@ -175,7 +157,7 @@ def searchPattern(searchPoints, ISULocation):
 
     for y in range(searchPoints):
 
-        travel(pingLocs[y].lat, pingLocs[y].lon, ISULocation.alt)
+        travel(pingLocs[y].lat, pingLocs[y].lon, ISULocation.alt, UAV)
         # ping drone, return 1 or 0 if success/fail
         placeholder = 3
         if placeholder == 1:
@@ -190,9 +172,9 @@ def searchPattern(searchPoints, ISULocation):
 This function handles the landing of the drone, with added safety checks to make sure the drone doesn't
 land so enthusiastically it crashes headlong into the ground. It takes the lat/lon coordinates of the home station as
 given this program by the user interface, and lands the drone, much slower when the altitude reaches 10m.
-Input Variables: homeLat, homeLong, floats.
+Input Variables: homeLat, homeLong, floats. UAV, UAV object created in main.
 '''
-def landingSequence(homeLat, homeLong):
+def landingSequence(homeLat, homeLong, UAV):
 
     print("Initiating landing sequence, standby to catch drone.")
     homeLocation = LocationGlobalRelative(homeLat,homeLong,0);
@@ -204,13 +186,5 @@ def landingSequence(homeLat, homeLong):
 
 
 
-#default location is canberra, australia
-#35.363261
-#149.1652299
-print(UAV.location.global_relative_frame.lat)
-print(UAV.location.global_relative_frame.lon)
 
-takeoffSequence(30);
-travel(-35.364,149.167,30);
-searchPattern(3, UAV.location.global_relative_frame)
 
