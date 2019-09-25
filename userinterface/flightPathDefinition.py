@@ -313,9 +313,21 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 editX, editY = t.split(', ')
                 dataPoints[editedRow*2] = float(editX)
                 dataPoints[editedRow*2+1] = float(editY)
-                self.list.currentItem().setText(
-                    str(editedRow + 1) + ".  " + "(" + str(dataPoints[editedRow*2]) + ", " + str(
-                        dataPoints[editedRow*2+1]) + ")")
+                if(editedRow == 0):
+                    self.list.currentItem().setText(
+                        str("ISU #1: ")  + "(" + str(dataPoints[editedRow*2]) + ", " + str(
+                            dataPoints[editedRow*2+1]) + ")")
+                elif(editedRow == 1):
+                    self.list.currentItem().setText(
+                        str("ISU #2: ") + "(" + str(dataPoints[editedRow * 2]) + ", " + str(
+                            dataPoints[editedRow * 2 + 1]) + ")")
+                elif(editedRow == 2):
+                    self.list.currentItem().setText(
+                        str("Ground Station: ") + "(" + str(dataPoints[editedRow * 2]) + ", " + str(
+                            dataPoints[editedRow * 2 + 1]) + ")")
+                else:
+                    print("Some error with ")
+                    return None;
             else:
                 QtWidgets.QMessageBox.about(self, "Unsaved edit", "Invalid format")
 
