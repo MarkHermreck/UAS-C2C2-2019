@@ -305,17 +305,17 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def listItemDoubleClicked(self):
         editedRow = self.list.currentRow()
-        s = str(dataPoints[0][editedRow]) + ', ' + str(dataPoints[1][editedRow]) + ', ' + str(dataPoints[2][editedRow])
-        t, okPressed = QInputDialog.getText(self, "Edit waypoint", "Format: X, Y, Alt", QLineEdit.Normal, s)
+        print(editedRow)
+        s = str(dataPoints[editedRow*2]) + ', ' + str(dataPoints[2*editedRow+1])
+        t, okPressed = QInputDialog.getText(self, "Edit waypoint", "Format: X, Y", QLineEdit.Normal, s)
         if okPressed:
-            if re.match('[-+]?[0-9]*\.?[0-9]+, [-+]?[0-9]*\.?[0-9]+, [-+]?[0-9]*\.?[0-9]+', t):
-                editX, editY, editAlt = t.split(', ')
-                dataPoints[0][editedRow] = float(editX)
-                dataPoints[1][editedRow] = float(editY)
-                dataPoints[2][editedRow] = float(editAlt)
+            if re.match('[-+]?[0-9]*\.?[0-9]+, [-+]?[0-9]*\.?[0-9]+', t):
+                editX, editY = t.split(', ')
+                dataPoints[editedRow*2] = float(editX)
+                dataPoints[editedRow*2+1] = float(editY)
                 self.list.currentItem().setText(
-                    str(editedRow + 1) + ".  " + "(" + str(dataPoints[0][editedRow]) + ", " + str(
-                        dataPoints[1][editedRow]) + ")  Alt: " + str(dataPoints[2][editedRow]))
+                    str(editedRow + 1) + ".  " + "(" + str(dataPoints[editedRow*2]) + ", " + str(
+                        dataPoints[editedRow*2+1]) + ")")
             else:
                 QtWidgets.QMessageBox.about(self, "Unsaved edit", "Invalid format")
 
