@@ -1,8 +1,8 @@
-'''
+"""
 Property of UAS C2C2 Senior Design Team 2019
 Team Members: Mark Hermreck, Joseph Lisac, Khaled Alshammari, Khaled Alharbi
 Questions about this code can be directed toward Mark Hermreck at markhermreck@gmail.com
-'''
+"""
 
 #importing all the functions and sundries needed from dronekit, mavlink, and the navigation module
 from dronekit import connect, LocationGlobal, LocationGlobalRelative, Vehicle, VehicleMode, Command
@@ -23,6 +23,8 @@ if not portInformation:
 
 print("Connecting to UAV.")
 UAV = connect(portInformation, wait_ready=True)
+
+
 
 # wait for radio transmission from ground station UI, store transmitted values into this array
 # 0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
