@@ -29,11 +29,14 @@ UAV = connect(portInformation, wait_ready=True)
 GPSCoordinates = [];
 
 #default location is canberra, australia
-#35.363261
+#-35.363261
 #149.1652299
 print(UAV.location.global_relative_frame.lat)
 print(UAV.location.global_relative_frame.lon)
 
-takeoffSequence(30, UAV)
+homeLoc = takeoffSequence(30, UAV)
 travel(-35.364,149.167,30, UAV)
-searchPattern(3, UAV.location.global_relative_frame, UAV)
+#searchPattern(3, UAV.location.global_relative_frame, UAV)
+landingSequence(homeLoc,UAV)
+
+
