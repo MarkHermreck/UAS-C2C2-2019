@@ -1,8 +1,8 @@
-'''
+"""
 Property of UAS C2C2 Senior Design Team 2019
 Team Members: Mark Hermreck, Joseph Lisac, Khaled Alshammari, Khaled Alharbi
 Questions about this code can be directed toward Mark Hermreck at markhermreck@gmail.com
-'''
+"""
 
 from dronekit import connect, LocationGlobal, LocationGlobalRelative, Vehicle, VehicleMode, Command
 from pymavlink import mavutil
