@@ -14,7 +14,7 @@ The only input is the takeoff goal altitude, and returns the location where the 
 Input Variables: goalAltitude in meters, integer. UAV, UAV object created in main.py
 '''
 def takeoffSequence(goalAltitude, UAV):
-    print("Takeoff Sequence Initializing. - Ensure area above UAV is clear.")
+    print("Takeoff Sequence Initializing - Ensure area above UAV is clear.")
 
     homeLocation = UAV.location.global_frame
 
@@ -187,12 +187,14 @@ def landingSequence(homeLocation, UAV):
     if not distanceRelative(UAV.location.global_relative_frame, homeLocation) < 10:
         print("UAV over 10 meters from ground station, initializing travel.")
         travel(homeLocation.lat, homeLocation.lon, 30, UAV)
-        print("Stand by to catch drone.")
+
+    print("Stand by to catch drone.")
 
     UAV.mode = VehicleMode("RTL")
-    UAV.mode = VehicleMode("Land")
+    UAV.mode = VehicleMode("LAND")
     while not UAV.location.global_relative_frame.alt < 2:
-        print("Landing. Current altitude: " + UAV.location.global_relative_frame.alt)
+        print("Landing. Current altitude: " + str(UAV.location.global_relative_frame.alt))
+        time.sleep(1)
 
     return None
 
