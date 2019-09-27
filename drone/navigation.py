@@ -10,11 +10,18 @@ import time, math, dronekit_sitl
 
 '''
 This function arms the UAV and initializes its takeoff to an altitude determined by the goalAltitude variable.
-The only input is the takeoff goal altitude, but returns nothing.
+The only input is the takeoff goal altitude, and returns the location where the drone took off.
 Input Variables: goalAltitude in meters, integer. UAV, UAV object created in main.py
 '''
 def takeoffSequence(goalAltitude, UAV):
     print("Takeoff Sequence Initializing. - Ensure area above UAV is clear.")
+
+    homeLocation = UAV.location.global_frame
+
+    if not (UAV.battery.level > 90):
+        return None
+    else:
+        print("Vehicle Battery Level: " + str(UAV.battery.level) + "%")
 
     while not UAV.is_armable:
         print("UAV Initializing")
@@ -36,7 +43,7 @@ def takeoffSequence(goalAltitude, UAV):
         time.sleep(1)
 
     print("Takeoff complete.")
-
+    return homeLocation;
 
 '''
 This function takes two LocationGlobalRelative objects and returns the distance between them in meters.
@@ -170,21 +177,22 @@ def searchPattern(searchPoints, ISULocation, UAV):
 
 '''
 This function handles the landing of the drone, with added safety checks to make sure the drone doesn't
-land so enthusiastically it crashes headlong into the ground. It takes the lat/lon coordinates of the home station as
-given this program by the user interface, and lands the drone, much slower when the altitude reaches 10m.
-Input Variables: homeLat, homeLong, floats. UAV, UAV object created in main.
+land so enthusiastically it crashes headlong into the ground. It takes the homeLocation of the drone created
+in the takeoff
+Input Variables: homeLocation, LocationGlobal object created in takeoffSequence(). UAV, UAV object created in main.
 '''
-def landingSequence(homeLat, homeLong, UAV):
-
-    print("Initiating landing sequence, standby to catch drone.")
-    homeLocation = LocationGlobalRelative(homeLat,homeLong,0);
+def landingSequence(homeLocation, UAV):
 
 
     if not distanceRelative(UAV.location.global_relative_frame, homeLocation) < 10:
-        print("UAV over 10 meters from home station, aborting landing sequence.")
-        return None
+        print("UAV over 10 meters from ground station, initializing travel.")
+        travel(homeLocation.lat, homeLocation.lon, 30, UAV)
+        print("Stand by to catch drone.")
 
+    UAV.mode = VehicleMode("RTL")
+    UAV.mode = VehicleMode("Land")
+    while not UAV.location.global_relative_frame.alt < 2:
+        print("Landing. Current altitude: " + UAV.location.global_relative_frame.alt)
 
-
-
+    return None
 
