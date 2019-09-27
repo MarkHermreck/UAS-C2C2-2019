@@ -37,7 +37,7 @@ print(UAV.location.global_relative_frame.lat)
 print(UAV.location.global_relative_frame.lon)
 
 homeLoc = takeoffSequence(30, UAV)
-travel(-35.364,149.167,30, UAV)
+#travel(-35.364,149.167,30, UAV)
 #searchPattern(3, UAV.location.global_relative_frame, UAV)
 landingSequence(homeLoc,UAV)
 
