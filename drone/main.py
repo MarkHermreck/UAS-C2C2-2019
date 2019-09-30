@@ -7,7 +7,7 @@ Questions about this code can be directed toward Mark Hermreck at markhermreck@g
 #importing all the functions and sundries needed from dronekit, mavlink, and the navigation module
 from dronekit import connect, LocationGlobal, LocationGlobalRelative, Vehicle, VehicleMode, Command
 from pymavlink import mavutil
-from navigation import takeoffSequence, distanceRelative, searchLocation, travel, searchPattern, landingSequence
+from navigation import takeoffSequence, distanceRelative, searchLocation, travel, searchPattern, landingSequence, safetyChecks
 import time, math, dronekit_sitl
 
 # This block of code connects to the UAV over its serial connection, Pi -> PixHawk
@@ -41,4 +41,7 @@ homeLoc = takeoffSequence(30, UAV)
 #searchPattern(3, UAV.location.global_relative_frame, UAV)
 landingSequence(homeLoc,UAV)
 
+UAV.close()
 
+if sitl is not None:
+    sitl.stop()
