@@ -108,8 +108,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.dc.axes.set_xlabel('Longitude in Decimal Degrees (m)')
         self.dc.axes.set_ylabel('Latitude in Decimal Degrees (m)')
         self.dc.axes.set_title('ISU & Ground Station Locations Entry')
-        self.axes.set_xlim(-270, 270)
-        self.axes.set_ylim(-270, 270)
+        self.axes.set_xlim(28, 38)
+        self.axes.set_ylim(82, 92)
 
         # Annotation happens here, see what the rest of the group thinks
 
@@ -132,8 +132,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.dc.axes.set_xlabel('Longitude in Decimal Degrees (m)')
         self.dc.axes.set_ylabel('Latitude in Decimal Degrees (m)')
         self.dc.axes.set_title('ISU & Ground Station Locations Entry')
-        self.axes.set_xlim(-270, 270)
-        self.axes.set_ylim(-270, 270)
+        self.axes.set_xlim(28, 38)
+        self.axes.set_ylim(82, 92)
 
         aw.list.clear()
 
@@ -152,12 +152,12 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def compute_initial_figure(self):
         self.axes.plot(dataPoints[0], dataPoints[1], c='c', linestyle='dashed', marker='o')
         # self.axes.plot(exampleData[0],exampleData[1],c='b',marker='o')
-        self.axes.set_xlim(-270, 270)
-        self.axes.set_ylim(-270, 270)
+        self.axes.set_xlim(28, 38)
+        self.axes.set_ylim(82, 92)
         self.axes.set_xlabel('Relative Position, West/East (m)')
         self.axes.set_ylabel('Relative Position, South/North (m)')
         self.axes.set_title('Flight Path Definition')
-
+        #original values -270, 270
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -281,8 +281,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.dc.axes.set_xlabel('Longitude in Decimal Degrees')
         self.dc.axes.set_ylabel('Latitude in Decimal Degrees')
         self.dc.axes.set_title('ISU & Ground Station Locations')
-        self.dc.axes.set_xlim(-270, 270)
-        self.dc.axes.set_ylim(-270, 270)
+        self.dc.axes.set_xlim(28, 38)
+        self.dc.axes.set_ylim(82, 92)
         # tuscaloosa GPS coords roughly
         # 33.209561 lat, 33 deg 12 min 34.412 sec N
         # -87.567526 long, 87 deg 34 min 3.092 sec W
@@ -307,7 +307,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         editedRow = self.list.currentRow()
         print(editedRow)
         s = str(dataPoints[editedRow*2]) + ', ' + str(dataPoints[2*editedRow+1])
-        t, okPressed = QInputDialog.getText(self, "Edit waypoint", "Format: X, Y", QLineEdit.Normal, s)
+        t, okPressed = QInputDialog.getText(self, "Edit waypoint", "Format: X.X, Y.Y without brackets", QLineEdit.Normal, s)
         if okPressed:
             if re.match('[-+]?[0-9]*\.?[0-9]+, [-+]?[0-9]*\.?[0-9]+', t):
                 editX, editY = t.split(', ')
@@ -372,12 +372,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.dc.axes.plot(dataPoints[0], dataPoints[1], c='c', linestyle='dashed', marker='o')
             self.dc.axes.plot(dataPoints[2], dataPoints[3], c='c', linestyle='dashed', marker='o')
             self.dc.axes.plot(dataPoints[4], dataPoints[5], c='c', linestyle='dashed', marker='o')
-            self.dc.axes.plot(dataPoints[0], dataPoints[1], c='c', linestyle='dashed', marker='o')
             self.dc.axes.set_xlabel('Longitude in Decimal Degrees')
             self.dc.axes.set_ylabel('Latitude in Decimal Degrees')
             self.dc.axes.set_title('ISU & Ground Station Locations')
-            self.dc.axes.set_xlim(-270, 270)
-            self.dc.axes.set_ylim(-270, 270)
+            self.dc.axes.set_xlim(28, 38)
+            self.dc.axes.set_ylim(82, 92)
 
             if self.altitudeCheckBox.isChecked():
 
@@ -432,8 +431,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         ax.set_ylabel('Relative Position, South/North (m)')
         ax.set_zlabel('Relative Altitude (m)')
 
-        ax.set_xlim(-270, 270)
-        ax.set_ylim(-270, 270)
+        ax.set_xlim(28, 38)
+        ax.set_ylim(82, 92)
         ax.set_zlim(0, 25)
 
         plt.show()
