@@ -11,7 +11,7 @@ import time, math, dronekit_sitl
 '''
 This function arms the UAV and initializes its takeoff to an altitude determined by the goalAltitude variable.
 The only input is the takeoff goal altitude, and returns the location where the drone took off.
-Input Variables: goalAltitude in meters, integer. UAV, UAV object created in main.py
+Input Variables: goalAltitude in meters, integer. UAV, Vehicle object created in main.py
 '''
 def takeoffSequence(goalAltitude, UAV):
     print("Takeoff Sequence Initializing - Ensure area above UAV is clear.")
@@ -19,9 +19,8 @@ def takeoffSequence(goalAltitude, UAV):
     homeLocation = UAV.location.global_frame
 
     if not (UAV.battery.level > 90):
-        return None
-    else:
-        print("Vehicle Battery Level: " + str(UAV.battery.level) + "%")
+        print("UAV battery under 90%. Exiting. Charge it!")
+        return None;
 
     while not UAV.is_armable:
         print("UAV Initializing")
@@ -83,7 +82,7 @@ def searchLocation(ISU, offsetNorth, offsetEast):
 '''
 This function is the basic travel-to-point function that will be utilized to travel to each of the ISUs and back
 to the ground station in turn.
-Input Variables: latitude, longitude, floats. alt, integer. UAV, UAV object created in main.py
+Input Variables: latitude, longitude, floats. alt, integer. UAV, Vehicle object created in main.py
 '''
 def travel(latitude, longitude, alt, UAV):
     print("Initializing travel to coordinates: ", latitude, ", ", longitude)
@@ -116,7 +115,7 @@ This function is called when no communication with an ISU can be established. It
 UAV, and plots a search pattern with an ever-increasingly sized square based on the input. The more points, the larger 
 the search square is, with thresholds determining the overall size of the pattern. Minimum points is four.
 Each next four increases the diagonal distance from original ISU location by 50 meters.
-Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, UAV object created in main.
+Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, Vehicle object created in main.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
 def searchPattern(searchPoints, ISULocation, UAV):
@@ -179,22 +178,50 @@ def searchPattern(searchPoints, ISULocation, UAV):
 This function handles the landing of the drone, with added safety checks to make sure the drone doesn't
 land so enthusiastically it crashes headlong into the ground. It takes the homeLocation of the drone created
 in the takeoff
-Input Variables: homeLocation, LocationGlobal object created in takeoffSequence(). UAV, UAV object created in main.
+Input Variables: homeLocation, LocationGlobal object created in takeoffSequence(). UAV, Vehicle object created in main.
 '''
 def landingSequence(homeLocation, UAV):
-
 
     if not distanceRelative(UAV.location.global_relative_frame, homeLocation) < 10:
         print("UAV over 10 meters from ground station, initializing travel.")
         travel(homeLocation.lat, homeLocation.lon, 30, UAV)
 
     print("Stand by to catch drone.")
-
-    UAV.mode = VehicleMode("RTL")
     UAV.mode = VehicleMode("LAND")
+
     while not UAV.location.global_relative_frame.alt < 2:
         print("Landing. Current altitude: " + str(UAV.location.global_relative_frame.alt))
         time.sleep(1)
 
     return None
+'''
+This function is a clean little packaging for a number of safety checks, and should be called before any of the other
+functions in this program are, to ensure the drone doesn't crash headlong into the ground with glee.
+Also sets vehicle mode to GUIDED, to allow for the next step in the UAV's tasks.
+Input Variables: UAV, Vehicle object created in main. homeLocation, ground station location created in takeoff function.
+Returns: 0, indicating failed check. 1, indicating all checks were successful, and drone may continue with its operations.
+'''
+def safetyChecks(UAV, homeLocation):
 
+    #checks battery level, fails with varying levels of severity if it's under %20
+    if(UAV.battery.level < 10):
+        print("Drone battery level under 10%. Landing immediately.")
+        UAV.mode = VehicleMode("LAND")
+        return 0
+    elif(UAV.battery.level < 20):
+        print("Drone battery level under 20%. Returning to ground station and landing.")
+        landingSequence(homeLocation, UAV)
+        return 0
+
+    print("Battery check passed.")
+
+    #sets mode to guided if it's not already, not a fail condition
+    if(UAV.mode != VehicleMode("GUIDED")):
+        print("Setting UAV mode to GUIDED.")
+        UAV.mode = VehicleMode("GUIDED")
+
+    print("Mode check passed.")
+
+    return 1;
+
+#REPLACE WITH LISTENER????
