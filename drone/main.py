@@ -10,6 +10,15 @@ from navigation import takeoffSequence, distanceRelative, searchLocation, travel
 from navigation import safetyChecks
 import time, math, dronekit_sitl
 
+#importing things needed for communication
+import logging
+import sys
+from communication import Communication
+
+# Connect to xBee
+COM_CONNECTION_STRING = '/dev/ttyUSB1'      #potential option
+com = Communication(COM_CONNECTION_STRING, 0.1)
+
 # This block of code connects to the UAV over its serial connection, Pi -> PixHawk
 # It also initalizes the vehicle object referenced throughout this file.
 # When the connection information is known, fill out the portInformation variable to disable auto-start of SITL.
