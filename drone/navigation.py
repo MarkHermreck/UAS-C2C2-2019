@@ -198,3 +198,32 @@ def landingSequence(homeLocation, UAV):
 
     return None
 
+'''
+This function is a clean little packaging for a number of safety checks, and should be called before any of the other
+functions in this program are, to ensure the drone doesn't crash headlong into the ground with glee.
+Also sets vehicle mode to GUIDED, to allow for the next step in the UAV's tasks.
+Input Variables: UAV, Vehicle object created in main. homeLocation, ground station location created in takeoff function.
+Returns: 0, indicating failed check. 1, indicating all checks were successful, and drone may continue with its operations.
+'''
+def safetyChecks(UAV, homeLocation):
+
+    #checks battery level, fails with varying levels of severity if it's under %20
+    if UAV.battery.level < 10:
+        print("Drone battery level under 10%. Landing immediately.")
+        UAV.mode = VehicleMode("LAND")
+        return 0
+    elif UAV.battery.level < 20:
+        print("Drone battery level under 20%. Returning to ground station and landing.")
+        landingSequence(homeLocation, UAV)
+        return 0
+
+    print("Battery check passed.")
+
+    #sets mode to guided if it's not already, not a fail condition
+    if UAV.mode != VehicleMode("GUIDED"):
+        print("Setting UAV mode to GUIDED.")
+        UAV.mode = VehicleMode("GUIDED")
+
+    print("Mode check passed.")
+
+    return 1
