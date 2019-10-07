@@ -216,14 +216,11 @@ def safetyChecks(UAV, homeLocation):
         print("Drone battery level under 20%. Returning to ground station and landing.")
         landingSequence(homeLocation, UAV)
         return 0
+    else:
+        print("Battery check passed.")
 
-    print("Battery check passed.")
-
-    #sets mode to guided if it's not already, not a fail condition
-    if UAV.mode != VehicleMode("GUIDED"):
-        print("Setting UAV mode to GUIDED.")
-        UAV.mode = VehicleMode("GUIDED")
-
-    print("Mode check passed.")
+    #sets mode to guided if it's not already
+    UAV.mode = VehicleMode("GUIDED")
+    print "Mode = GUIDED confirmed."
 
     return 1
