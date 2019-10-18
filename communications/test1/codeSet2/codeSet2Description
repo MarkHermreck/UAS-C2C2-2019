@@ -1,0 +1,3 @@
+This set of code is the reception side of the sample file test.
+This set of code receives a file through an xbee unit.
+In order to use this code, you will have to adjust which port the xbee is connected to at the bottom of the code.
