@@ -1,0 +1,2 @@
+This folder contains the base functions used to interact with the xbee unit.
+The other directories include test cases and examples on how to use these functions.
