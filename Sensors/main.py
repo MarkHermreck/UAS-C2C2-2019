@@ -9,7 +9,7 @@ from communication import Communication
 
 # Connect to xBee
 COM_CONNECTION_STRING = '/dev/ttyUSB1'      #potential option
-#com = Communication(COM_CONNECTION_STRING, 0.1)
+com = Communication(COM_CONNECTION_STRING, 0.1)
 
 #three things need to be done
 #get temperature every X
@@ -36,8 +36,20 @@ def logTemperature(logfile):
     return None;
 
 
-while True:
+"""
+This function sends an entire file.
+Inputs: filetoSend, string value of entire name of file, including file extension.
+"""
+def sendFile(filetoSend):
+    f = open(filetoSend, "r")
+    f1 = f.readlines()
+    for x in f1:
+        com.send(x)
+    f.close()
+    # file sent, inform the receiver
+    com.send("File sent.")
 
+while True:
     if time.time() - logTime >= 300:
         logTemperature(logFile)
         logTime = time.time()
