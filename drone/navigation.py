@@ -119,7 +119,7 @@ Each next four increases the diagonal distance from original ISU location by 50 
 Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, UAV object created in main.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
-def searchPattern(searchPoints, ISULocation, UAV):
+def searchPattern(searchPoints, ISULocation, UAV, ISUNum):
     # 35.355 meters offset to N/E for 50 meter right triangle hypotenuse
 
     print "Search pattern initializing with " + str(searchPoints) + " discrete points."
@@ -166,10 +166,23 @@ def searchPattern(searchPoints, ISULocation, UAV):
 
         travel(pingLocs[y].lat, pingLocs[y].lon, ISULocation.alt, UAV)
         # ping drone, return 1 or 0 if success/fail
+
+        if ISUNum = 2:
+            firstPing = time.time();
+
+            com.send("Requesting ISU2 data")
+            ISUTwo = com.receive()
+            while ISUTwo is not "ISU2 Ready":
+                com.send("Requesting ISU2 data")
+                ISUTwo = com.receive()
+                if time.time() - firstPing > 6:
+                    break;
+
         placeholder = 3
         if placeholder == 1:
             print("ISU communication established, exiting search pattern successfully.")
             return 1
+
 
     print("Search pattern executed, no ISU located. Exiting.")
     return 0
