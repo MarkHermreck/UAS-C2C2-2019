@@ -11,7 +11,7 @@ from communication import Communication
 
 # Connect to xBee
 COM_CONNECTION_STRING = '/dev/ttyUSB1'      #potential option
-com = Communication(COM_CONNECTION_STRING, 0.1)
+com = Communication(COM_CONNECTION_STRING, 0.5)
 
 #creating temperature log file
 logFile = open("ISULogs.txt", "a+")
@@ -66,6 +66,8 @@ while True:
     #radio check here, joe
     radioCheck = com.receive()
     if radioCheck == "Requesting ISU1 data":    #each box should probably have a different name (ISU1, ISU2)
+        com.send("ISU1Ready")                   #ping response
+        time.sleep(1)
         com.send("SendingTemperatureFile")
         sendTextFile()  #find name of file
         com.send("EndOfFile")
