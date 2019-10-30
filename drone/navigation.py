@@ -52,8 +52,8 @@ It is also found in the DroneKit documentation at https://dronekit-python.readth
 Input Variables: Location1, LocationGlobalRelative. Location2, LocationGlobalRelative. 
 '''
 def distanceRelative(Location1, Location2):
-    latitude = Location2.lat - Location1.lat
-    longitude = Location2.lon - Location1.lon
+    latitude = float(Location2.lat) - float(Location1.lat)
+    longitude = float(Location2.lon) - float(Location1.lon)
 
     distMeters = round(math.sqrt((latitude * latitude) + (longitude * longitude)) * 1.113195e5, 3)
 
