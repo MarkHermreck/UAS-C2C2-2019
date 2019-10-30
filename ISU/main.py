@@ -64,6 +64,14 @@ iteration = 0;
 while True:
 
     #radio check here, joe
+    radioCheck = com.receive()
+    if radioCheck == "Requesting ISU1 data":    #each box should probably have a different name (ISU1, ISU2)
+        com.send("SendingTemperatureFile")
+        sendTextFile()  #find name of file
+        com.send("EndOfFile")
+        com.send("SendingAudioFile")
+        sendAudioFile() #still writing this
+        com.send("EndOfFile")
 
     if time.time() - logTime >= 300:
         logTemperature(logFile)
