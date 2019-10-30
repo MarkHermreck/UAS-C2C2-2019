@@ -85,7 +85,7 @@ while ISUOne is not "ISU1 Ready":
     ISUOne = com.receive()
     if time.time() - firstPing > 6:
         safetyChecks(UAV, homeLoc)
-        success = searchPattern(3, UAV.location.global_relative_frame, UAV)
+        success = searchPattern(3, UAV.location.global_relative_frame, UAV, 1)
         break
 
 if success:
@@ -112,7 +112,7 @@ while ISUTwo is not "ISU2 Ready":
     ISUTwo = com.receive()
     if time.time() - firstPing > 6:
         safetyChecks(UAV, homeLoc)
-        success = searchPattern(3, UAV.location.global_relative_frame, UAV)
+        success = searchPattern(3, UAV.location.global_relative_frame, UAV, 2, com)
         break
 
 if success:
