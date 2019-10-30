@@ -33,11 +33,28 @@ if not portInformation:
 print("Connecting to UAV.")
 UAV = connect(portInformation, wait_ready=True)
 
-
-
 # wait for radio transmission from ground station UI, store transmitted values into this array
 # 0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
 GPSCoordinates = [-35.364,149.167, -35.365, 149.168, 0, 0];
+"""
+waypoints = com.receive()
+coordinateFile = open("GPSCoords.txt", "w+")
+while waypoints != "EndOfFile":
+    if waypoints is not None:
+        coordinateFile.write(waypoints)
+    waypoints = com.receive()
+coordinateFile.close();
+"""
+coords = open("GPSCoords.txt", "r")
+
+iteration = 0;
+for line in coords:
+    for word in line.split():
+        GPSCoordinates[iteration] = float(word)
+        iteration -= -1
+
+for i in range(len(GPSCoordinates)):
+    print(GPSCoordinates[i])
 
 #default location is canberra, australia
 #-35.363261
@@ -52,27 +69,61 @@ ISU1Location = LocationGlobalRelative(GPSCoordinates[0], GPSCoordinates[1], alt)
 ISU2Location = LocationGlobalRelative(GPSCoordinates[2], GPSCoordinates[3], alt)
 GNDLocation = LocationGlobalRelative(GPSCoordinates[4], GPSCoordinates[5], alt)
 
-
 #takes off and sets the homelocation. alt of it is 0, and is what the LGR's base theirs off of
 homeLoc = takeoffSequence(alt, UAV)
 #travels to first ISU
 
 travel(GPSCoordinates[0],GPSCoordinates[1], alt, UAV)
 UAV.mode = VehicleMode("LOITER")
-ISUOne = 0; #com.ping()
-if not ISUOne:
-    safetyChecks(UAV, homeLoc)
-    searchPattern(3, UAV.location.global_relative_frame, UAV)
-safetyChecks(UAV, homeLoc)
+firstPing = time.time();
 
+com.send("Requesting ISU1 data")
+ISUOne = com.receive()
+success = 1;
+while ISUOne is not "ISU1 Ready":
+    com.send("Requesting ISU1 data")
+    ISUOne = com.receive()
+    if time.time() - firstPing > 6:
+        safetyChecks(UAV, homeLoc)
+        success = searchPattern(3, UAV.location.global_relative_frame, UAV)
+        break
+
+if success:
+    ISU1Log = open("ISU1Log.txt", "w+")
+    tempreceive = com.receive()
+    while tempreceive != "EndOfFile":
+        if tempreceive is not None:
+            ISU1Log.write(tempreceive)
+        tempreceive = com.receive()
+    ISU1Log.close();
+
+safetyChecks(UAV, homeLoc)
 
 #travels to second ISU location,
 travel(GPSCoordinates[2],GPSCoordinates[3], alt, UAV)
 UAV.mode = VehicleMode("LOITER")
-ISUTwo = 0; #com.ping()
-if not ISUTwo:
-    safetyChecks(UAV, homeLoc)
-    searchPattern(3, UAV.location.global_relative_frame, UAV)
+firstPing = time.time();
+
+com.send("Requesting ISU2 data")
+ISUTwo = com.receive()
+success = 1;
+while ISUTwo is not "ISU2 Ready":
+    com.send("Requesting ISU2 data")
+    ISUTwo = com.receive()
+    if time.time() - firstPing > 6:
+        safetyChecks(UAV, homeLoc)
+        success = searchPattern(3, UAV.location.global_relative_frame, UAV)
+        break
+
+if success:
+    ISU2Log = open("ISU2Log.txt", "w+")
+    tempreceive = com.receive()
+    while tempreceive != "EndOfFile":
+        if tempreceive is not None:
+            ISU2Log.write(tempreceive)
+        tempreceive = com.receive()
+    ISU2Log.close();
+
 safetyChecks(UAV, homeLoc)
 
 #returns home
