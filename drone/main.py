@@ -128,5 +128,28 @@ safetyChecks(UAV, homeLoc)
 
 #returns home
 landingSequence(homeLoc,UAV)
-#com.send()
+
+"""
+This function sends an entire text file over the Xbees.
+Inputs: filetoSend, string value of entire name of file, including file extension.
+"""
+def sendTextFile(filetoSend):
+    f = open(filetoSend, "r")
+    f1 = f.readlines()
+    for x in f1:
+        com.send(x)
+    f.close()
+    # file sent, inform the receiver
+    com.send("Text file sent.")
+
+ISU1Log = open("ISU1Log.txt", "r")
+ISU2Log = open("ISU2Log.txt", "r")
+
+
+com.send("ISULog1")
+sendTextFile(ISU1Log)
+com.send("EndOfFile")
+com.send("ISULog2")
+sendTextFile(ISU2Log)
+com.send("EndOfFile")
 
