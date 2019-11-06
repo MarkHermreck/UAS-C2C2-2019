@@ -116,7 +116,8 @@ This function is called when no communication with an ISU can be established. It
 UAV, and plots a search pattern with an ever-increasingly sized square based on the input. The more points, the larger 
 the search square is, with thresholds determining the overall size of the pattern. Minimum points is four.
 Each next four increases the diagonal distance from original ISU location by 50 meters.
-Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, UAV object created in main.
+Input Variables: searchPoints, integer. ISULocation, LocationGlobalRelative. UAV, UAV object created in main. ISUNum,
+the number of the ISU the UAV is attempting to locate. com, the communications object created in main.
 Returns: 1, indicating successful location of ISU. 0, indicating failure to locate ISU. None, function/input error.
 '''
 def searchPattern(searchPoints, ISULocation, UAV, ISUNum, com):
