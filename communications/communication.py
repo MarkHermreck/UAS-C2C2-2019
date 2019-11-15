@@ -8,7 +8,7 @@ class Communication:
     """Class abstracting communication using the Xbee via serial."""
     def __init__(self, port, time_out):
         self.logger = logging.getLogger(__name__)
-        self.ser = serial.Serial(port, timeout=time_out)
+        self.ser = serial.Serial(port, 57600, timeout=time_out)
 
     def send(self, data):
         """Send data via the communication module.
@@ -25,6 +25,14 @@ class Communication:
         # send data
         self.ser.write(byte_data)
         self.ser.write(b'\n')
+
+    """
+    Send data over serial through communication module.
+
+    Intended for use in transferring audio files.
+    """
+    def sendAudio(self, data):
+        self.ser.write(data)
 
     def receive(self):
         """Receive data from the communcation module.
@@ -51,3 +59,11 @@ class Communication:
             self.logger.warn('ValueError: {}'.format(err))
             self.logger.warn('received: {}'.format(jsoned_data))
             return None
+
+    """
+    Send data over serial through communication module.
+
+    Intended for use in transferring audio files.
+    """
+    def receiveAudio(self):
+        return self.ser.read()
