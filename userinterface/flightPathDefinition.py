@@ -27,7 +27,7 @@ progversion = "0.1"
 # format is [[x], [y], [x2], [y2], [x3], [y3]]
 dataPoints = [[], [], [], [], [], []]
 
-#com = communication.Communication(sys.argv[1], float(sys.argv[2]))
+com = communication.Communication(sys.argv[1], float(sys.argv[2]))
 
 
 class MyMplCanvas(FigureCanvas):
@@ -417,6 +417,16 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
             #uncomment below when ready to start testing data, as well as uncommenting line 30
             #com.send(dictList)
+            for i in range(0, 3):
+                #send x
+                com.send(dataPoints[2*i])
+                #space for seperation
+                com.send(" ")
+                #send y
+                com.send(dataPoints[2*i+1])
+                com.send(" ")
+                
+            com.send("EndOfFile")
 
     # msg.exec_()
 
