@@ -28,7 +28,7 @@ testSITL = None
 if not portInformation:
     testSITL = dronekit_sitl.start_default()
     portInformation = testSITL.connection_string()
-    print "Starting SITL Test Environment, No UAV Detected"
+    print ("Starting SITL Test Environment, No UAV Detected")
 
 print("Connecting to UAV.")
 UAV = connect(portInformation, wait_ready=True)
