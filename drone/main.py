@@ -36,7 +36,7 @@ UAV = connect(portInformation, wait_ready=True)
 # wait for radio transmission from ground station UI, store transmitted values into this array
 # 0-1 are ISU 1 lat/long, 2-3 ISU 2 lat/long, 4-5 gnd station lat/long
 GPSCoordinates = [-35.364,149.167, -35.365, 149.168, 0, 0];
-"""
+
 waypoints = com.receive()
 coordinateFile = open("GPSCoords.txt", "w+")
 while waypoints != "EndOfFile":
@@ -44,7 +44,7 @@ while waypoints != "EndOfFile":
         coordinateFile.write(waypoints)
     waypoints = com.receive()
 coordinateFile.close();
-"""
+
 coords = open("GPSCoords.txt", "r")
 
 iteration = 0;
