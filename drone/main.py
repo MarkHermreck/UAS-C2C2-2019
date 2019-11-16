@@ -22,7 +22,7 @@ com = Communication(COM_CONNECTION_STRING, 0.1)
 # This block of code connects to the UAV over its serial connection, Pi -> PixHawk
 # It also initalizes the vehicle object referenced throughout this file.
 # When the connection information is known, fill out the portInformation variable to disable auto-start of SITL.
-portInformation = None #'127.0.0.1:14550'
+portInformation = '/dev/ttyAMA0' #'127.0.0.1:14550'
 testSITL = None
 
 if not portInformation:
