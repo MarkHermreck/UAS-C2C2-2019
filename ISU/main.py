@@ -77,7 +77,7 @@ while True:
         sendTextFile()  #find name of file
         com.send("EndOfFile")
         com.send("SendingAudioFile")
-        sendAudioFile() #still writing this
+        #sendAudioFile() #still writing this
         com.send("EndOfFile")
 
     if time.time() - logTime >= 300:
