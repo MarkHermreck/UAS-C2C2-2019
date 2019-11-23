@@ -38,7 +38,12 @@ Inputs: logFile, the txt file created earlier in the main function.
 def logTemperature(logfile):
     timeString = str(time.ctime(time.time()))
     temperature = 0;
-    #temperature = temperatureHandler.get_temperatures();
+    #temperature stuff, should move to function
+    DHT_SENSOR = Adafruit_DHT.DHT22
+    DHT_PIN = 4
+
+    _, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+
     logfile.write("Temperature data recorded @ " + timeString + " with a value of " + str(temperature) + " degrees Celsius")
     return None;
 
