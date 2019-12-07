@@ -4,7 +4,7 @@ Team Members: Mark Hermreck, Joseph Lisac, Khaled Alshammari, Khaled Alharbi
 Questions about this code can be directed toward Mark Hermreck at markhermreck@gmail.com
 """
 
-import PyAudio
+import pyaudio
 import wave
 import os, time
 
@@ -26,7 +26,7 @@ audio = pyaudio.PyAudio()
 def audio_record(recordingNumber):
     wav_output_filename = 'test' + str(recordingNumber) + '.wav'
     #setup audio input stream
-    stream=audio.open(format = form_1,rate=samp_rate,channels=chans, input_device_index = dev_index, input=True, frames_per_buffer=chunk)
+    stream=audio.open(format = form_1,rate=samp_rate,channels=chans, input_device_index = 2, input=True, frames_per_buffer=chunk)
     print("recording")
     frames=[]
 
@@ -39,10 +39,9 @@ def audio_record(recordingNumber):
             break
 
     print("finished recording")
-
     stream.stop_stream()
     stream.close()
-    audio.terminate()
+    #audio.terminate()
 
     #creates wave file with audio read in
     #Code is from the wave file audio tutorial as referenced below

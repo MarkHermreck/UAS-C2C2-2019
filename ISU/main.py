@@ -4,13 +4,14 @@ Team Members: Mark Hermreck, Joseph Lisac, Khaled Alshammari, Khaled Alharbi
 Questions about this code can be directed toward Mark Hermreck at markhermreck@gmail.com
 """
 
-import time, logging, sys, temperusb, temper, PyAudio, wave, os, time, test_audio_record
+import time, logging, sys, pyaudio, wave, os, time, test_audio_record
 import RPi.GPIO as GPIO
 import time
+import Adafruit_DHT
 from communication import Communication
 
 # Connect to xBee
-COM_CONNECTION_STRING = '/dev/ttyUSB1'      #potential option
+COM_CONNECTION_STRING = '/dev/ttyUSB0'      #potential option
 com = Communication(COM_CONNECTION_STRING, 0.5)
 
 #creating temperature log file
@@ -44,7 +45,7 @@ def logTemperature(logfile):
 
     _, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
 
-    logfile.write("Temperature data recorded @ " + timeString + " with a value of " + str(temperature) + " degrees Celsius")
+    logfile.write("Temperature data recorded @ " + timeString + " with a value of " + str(temperature) + " degrees Celsius \n")
     return None;
 
 
@@ -66,8 +67,12 @@ def sendTextFile(filetoSend):
 #infinitely looping function that checks the motion detector, logs a temperature value if it's been 5 minutes, and checks
 #the radio for a ping from the drone
 iteration = 0;
-while True:
 
+logTemperature(logFile)
+logFile.close()
+
+while True:
+    logFile = open("ISULogs.txt", "a+")
     #radio check here, joe
     radioCheck = com.receive()
     if radioCheck == "Requesting ISU1 data":    #each box should probably have a different name (ISU1, ISU2)
@@ -86,12 +91,14 @@ while True:
 
     if GPIO.input(pir):  # If PIR pin goes high, motion is detected
         if time.time() - lastdetectTime > 5:
-
+            timeString = str(time.ctime(time.time()))
+            logFile.write("Motion detected at @ " + timeString + " \n")
             print("Motion Detected!")
             test_audio_record.audio_record(iteration)  # call the audo_record program and excecute the audio_record function.
             iteration += 1
+            
             lastdetectTime = time.time();
         else:
             print("Motion detected during audio record, aborting.")
 
-
+    logFile.close()
