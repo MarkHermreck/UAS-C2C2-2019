@@ -1,1 +1,4 @@
 
+this folder contains a possible fix to the communications issue, it is a replacement for the main.py in the drone folder
+
+BE AWARE: This has not been tested, and should be approached with caution.
