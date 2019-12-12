@@ -11,7 +11,7 @@ import Adafruit_DHT
 from communication import Communication
 
 # Connect to xBee
-COM_CONNECTION_STRING = '/dev/ttyUSB0'      #potential option
+COM_CONNECTION_STRING = '/dev/ttyAMA0'      #potential option
 com = Communication(COM_CONNECTION_STRING, 0.5)
 
 #creating temperature log file
@@ -22,7 +22,7 @@ lastdetectTime = time.time();
 
 #setting up RPI GPIO
 GPIO.setmode(GPIO.BOARD) #Set GPIO to pin numbering
-pir = 8 #Assign pin 8 to PIR
+pir = 40 #Assign pin 8 to PIR
 #led = 10 Assign pin 10 to LED
 GPIO.setup(pir, GPIO.IN) #Setup GPIO pin PIR as input
 print ("Motion detector initializing . . .")
@@ -61,7 +61,31 @@ def sendTextFile(filetoSend):
     f.close()
     # file sent, inform the receiver
     com.send("Text file sent.")
+    
+def sendAudioFile(filetoSend):
+    #hardcoded file format
+    n_channels = 1
+    sample_width = 2
+    framerate = 44100
+    n_frames = 204800
+    comp_type = "NONE"
+    comp_name = "not compressed"
 
+    f = wave.open(filetoSend, "rb")
+    
+    bytesSent = 0
+    lastBytesSent = 0
+    f1 = f.readframes(n_frames)
+    
+    #send file
+    for x in f1:
+        com.sendAudio(bytes([x]))
+        bytesSent = bytesSent + 1
+        if bytesSent >= lastBytesSent + 1024:
+            lastBytesSent = lastBytesSent + 1024
+        
+    #file sent
+    f.close()
 
 
 #infinitely looping function that checks the motion detector, logs a temperature value if it's been 5 minutes, and checks
@@ -76,14 +100,16 @@ while True:
     #radio check here, joe
     radioCheck = com.receive()
     if radioCheck == "Requesting ISU1 data":    #each box should probably have a different name (ISU1, ISU2)
-        com.send("ISU1Ready")                   #ping response
+        com.send("ISU1 Ready")                   #ping response
+        print("received ping")
         time.sleep(1)
         com.send("SendingTemperatureFile")
-        sendTextFile()  #find name of file
+        audioName = 'test' + str(iteration) + '.wav'
+        sendTextFile("/home/pi/ISULogs.txt")  #find name of file
         com.send("EndOfFile")
-        com.send("SendingAudioFile")
-        #sendAudioFile() #still writing this
-        com.send("EndOfFile")
+        #com.send("SendingAudioFile")
+        sendAudioFile("/home/pi/" + audioName) #still writing this
+        #com.send("EndOfFile")
 
     if time.time() - logTime >= 300:
         logTemperature(logFile)
