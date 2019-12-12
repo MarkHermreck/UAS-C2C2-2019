@@ -1,2 +1,11 @@
 This folder contains the code that will:
 1. Send gps coordinates to the drone.
+2. Wait for drone to return to receive files
+
+
+Important notes:
+1. This file uses the same EndOfFile stop message as everything else.
+   This means that the program may stop while the drone stops to receive information from the ISUs.  
+   If this happens, it is recommended to stop the program with ctrl+c, then restart the program.
+   
+2. In order to run this program, you will need to install pyserial.
