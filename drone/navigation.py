@@ -23,15 +23,16 @@ def takeoffSequence(goalAltitude, UAV):
     else:
         print "Vehicle Battery Level: " + str(UAV.battery.level) + "%"
 
-    while not UAV.is_armable:
-        print "UAV Initializing"
-        time.sleep(2)
+    #while not UAV.is_armable:
+        #print "UAV Initializing"
+        #time.sleep(2)
 
     UAV.mode = VehicleMode("GUIDED")
     UAV.armed = True
 
     while not UAV.armed:
         print "Arming, please wait."
+        UAV.armed = True
         time.sleep(2)
 
     print "UAV Armed. "
@@ -87,9 +88,9 @@ Input Variables: latitude, longitude, floats. alt, integer. UAV, UAV object crea
 '''
 def travel(latitude, longitude, alt, UAV):
     print "Initializing travel to coordinates: " + str(latitude) + ", " + str(longitude)
-    if not UAV.location.global_relative_frame.alt >= 10:
-        print "UAV altitude under 10 meters, aborting travel."
-        return None
+    #if not UAV.location.global_relative_frame.alt >= 1:
+        #print "UAV altitude under 10 meters, aborting travel."
+       # return None
 
     #if UAV.system_status == ACTIVE:
     #    print("UAV active, beginning travel.")
@@ -126,9 +127,9 @@ def searchPattern(searchPoints, ISULocation, UAV, ISUNum, com):
     print "Search pattern initializing with " + str(searchPoints) + " discrete points."
 
     # First, checking to make sure the UAV is in the air, armed, etc.
-    if not UAV.location.global_relative_frame.alt >= 10:
-        print "UAV under 10 meters, aborting search pattern."
-        return None
+    #if not UAV.location.global_relative_frame.alt >= 1:
+     #   print "UAV under 10 meters, aborting search pattern."
+      #  return None
 
     #if UAV.system_status == ACTIVE:
     #    print("UAV active, beginning search pattern.")
@@ -151,13 +152,13 @@ def searchPattern(searchPoints, ISULocation, UAV, ISUNum, com):
     for x in range(searchPoints):
         corner = x % 4;
         if corner == 0:
-            pingLocs[x] = searchLocation(ISULocation, 35.355 * squares, 35.355 * squares)
+            pingLocs[x] = searchLocation(ISULocation, 3.5355 * squares, 3.5355 * squares)
         if corner == 1:
-            pingLocs[x] = searchLocation(ISULocation, -35.355 * squares, 35.355 * squares)
+            pingLocs[x] = searchLocation(ISULocation, -3.5355 * squares, 3.5355 * squares)
         if corner == 2:
-            pingLocs[x] = searchLocation(ISULocation, -35.355 * squares, -35.355 * squares)
+            pingLocs[x] = searchLocation(ISULocation, -3.5355 * squares, -3.5355 * squares)
         if corner == 3:
-            pingLocs[x] = searchLocation(ISULocation, 35.355 * squares, -35.355 * squares)
+            pingLocs[x] = searchLocation(ISULocation, 3.5355 * squares, -3.5355 * squares)
 
     # this loop tells the drone to go to each of the locations created above, and ping the ISU
     # exits function upon successful ping, because data can be transferred
@@ -167,7 +168,7 @@ def searchPattern(searchPoints, ISULocation, UAV, ISUNum, com):
 
         travel(pingLocs[y].lat, pingLocs[y].lon, ISULocation.alt, UAV)
         # ping drone, return 1 or 0 if success/fail
-
+        """
         if ISUNum == 1:
             firstPing = time.time();
 
@@ -194,8 +195,8 @@ def searchPattern(searchPoints, ISULocation, UAV, ISUNum, com):
                     break;
 
             if ISUTwo == "ISU2 Ready":
-                return 1;s
-
+                return 1;
+        """
     print("Search pattern executed, no ISU located. Exiting.")
     return 0
 
@@ -211,16 +212,18 @@ def landingSequence(homeLocation, UAV):
 
     if not distanceRelative(UAV.location.global_relative_frame, homeLocation) < 10:
         print("UAV over 10 meters from ground station, initializing travel.")
-        travel(homeLocation.lat, homeLocation.lon, 30, UAV)
+        travel(homeLocation.lat, homeLocation.lon, 3, UAV)
 
     print("Stand by to catch drone.")
 
-    UAV.mode = VehicleMode("RTL")
+    #UAV.mode = VehicleMode("RTL")
     UAV.mode = VehicleMode("LAND")
     while not UAV.location.global_relative_frame.alt < 2:
         print "Landing. Current altitude: " + str(UAV.location.global_relative_frame.alt)
         time.sleep(1)
-
+    
+    UAV.armed = False
+    
     return None
 
 '''
